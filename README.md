@@ -99,7 +99,7 @@ At every step:
 The commands below are the underlying technical interface. Use these for scripting, debugging, or when you prefer explicit control:
 
 ```powershell
-# Clone the installer source. This repository is private, so gh auth is required.
+# Clone the public installer source.
 gh repo clone skywithouty/persistent-agent-session-loop
 cd persistent-agent-session-loop
 

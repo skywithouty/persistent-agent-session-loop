@@ -4,25 +4,22 @@ This file is the first document to give Claude Code in the long-running Cursor t
 
 ## One-Time Session Prompt
 
-After opening Claude Code in the project root, give it this natural-language prompt:
+After opening Claude Code in the project root, use this natural-language prompt:
 
 ```text
 请先阅读 START_HERE_FOR_CLAUDE.md。
 
-你是 persistent session agent loop 里的执行端，不是总规划端。
-你的任务来自 .session-loop/inbox/。
+你是 persistent session agent loop 里的执行端（executor），不是总规划端。
+你的任务来自 .session-loop/inbox/，由 Codex App 写入。
 你执行完成后，把结构化报告写到 .session-loop/outbox/。
-如果没有新任务，就不要改文件。
-如果任务需要密钥、付费 API、长时间训练、大量下载、大量删除、git 历史重写，必须停止并在报告里写 Blocked。
+如果没有新任务（next_actor 不是 "claude"），就不要改文件。
+如果任务需要密钥、付费 API、大量下载、大量删除、git 历史重写，必须停止并在报告里写 Blocked。
+
+启动一个定时轮询循环来持续检查新任务：
+/loop 5m "Read .session-loop/STATE.json fresh from disk via PowerShell. If next_actor is not 'claude', do nothing. If it is 'claude', read the task file from .session-loop/inbox/, execute every required step, write the structured report to .session-loop/outbox/, update STATE.json to set next_actor = 'codex', and append to .session-loop/logs/events.jsonl."
 ```
 
-Then start a scheduled loop inside the same Claude Code session:
-
-```text
-/loop 5m "Run: Get-Location. Run: Get-Content -LiteralPath '.session-loop\STATE.json' -Encoding UTF8. Never decide next_actor from conversation memory — only from the file you just read from disk. If next_actor is not 'claude', do nothing. If next_actor IS 'claude', run: Get-Content -LiteralPath '.session-loop\inbox\<id>.md' -Encoding UTF8 to read the task file from disk. Execute the task, write the report to .session-loop/outbox/, update STATE.json, and append to events.jsonl."
-```
-
-The exact interval can be changed later. Five minutes is a practical first value.
+This is a copy-paste natural-language prompt. The user should not need to edit cron syntax or file paths. The `/loop` interval (5 minutes here) can be adjusted — 5 minutes is a practical starting value for active research sessions.
 
 ## Your Role
 

@@ -96,11 +96,11 @@ Deliverables:
 - template files (complete)
 - README with copy-paste commands (complete)
 - full Phase 5 fixture sweep (complete round 23, 11/11 PASS)
-- GitHub-hosted install path
+- GitHub-hosted install path (complete — published to https://github.com/skywithouty/persistent-agent-session-loop)
 
 Success criteria:
 
-- user can initialize a new project from GitHub
+- user can initialize a new project from GitHub (complete)
 - no manual file copying is required
 - installed files are inspectable and project-local
 - existing project files are not overwritten without confirmation
@@ -113,6 +113,8 @@ Goal: make the loop useful for paper reproduction work.
 
 Deliverables:
 
+- natural-language cross-project quick start (round 26 — README and START docs now include copy-paste prompts)
+- Codex reviewer heartbeat docs (round 27 — two-loop explanation, heartbeat rule in CODEX_REVIEW_RHYTHM.md)
 - paper reproduction goal template
 - experiment report template
 - dataset and model download gates
@@ -132,5 +134,7 @@ Estimated time: 2 to 5 days depending on paper complexity.
 
 Phase 3 and Phase 4 custom context infrastructure is deprecated. The project relies on Claude Code default auto-compact.
 
-The next engineering task is **Phase 5 GitHub-hosted install path (external publishing step)**. The design spec, doctor (with PS 5.1 @() fix), installer (install / -Check / -WhatIf), uninstaller (-Force / -WhatIf, with removedCount and source-guard fixes), README, template files, full fixture sweep (11/11 PASS round 23), and cross-project E2E validation (round 24) are all complete. GitHub hosting is a user-controlled external publishing decision — the scripts are fully self-contained and ready for distribution.
+Phase 5 is complete. The project is published to GitHub at `https://github.com/skywithouty/persistent-agent-session-loop`. Install, doctor/check, uninstall, fixture sweep (11/11 PASS), and cross-project E2E validation are all done. The repository excludes `.session-loop/` and `.claude/` runtime history; installed projects generate their own local task board state.
+
+The next engineering phase is **Phase 6: Research Workflow Hardening** — making the loop useful for paper reproduction work with experiment templates, dataset/model download gates, command log summaries, and metrics comparison reports.
 

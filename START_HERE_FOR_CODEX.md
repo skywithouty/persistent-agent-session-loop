@@ -2,6 +2,54 @@
 
 This file is the first document to give a new Codex App task when starting the persistent session loop project.
 
+## Two Entry Points
+
+There are two distinct starting points for Codex App:
+
+### 1. Cross-Project Research Use (primary)
+
+You are in a target research project that already has `.session-loop/` installed (or needs it installed). The user describes a research goal. Your job includes creating a **reviewer heartbeat** so you automatically review Claude reports and write the next task without the user having to poke you.
+
+```text
+Please set up a persistent session agent loop for this project.
+
+Install it from https://github.com/skywithouty/persistent-agent-session-loop:
+- Clone the repo to a temporary location
+- Run .\install.ps1 -TargetPath "<this project directory>" -SourcePath "<cloned repo>"
+- Run .\doctor.ps1 to verify the installation
+
+Then act as the controller/planner/reviewer:
+- Read START_HERE_FOR_CODEX.md for your full role description
+- Read CODEX_REVIEW_RHYTHM.md for the round lifecycle checklist
+- Write concrete bounded tasks to .session-loop/inbox/
+- Review Claude reports in .session-loop/outbox/
+- Write reviews to .session-loop/reviews/
+- Keep concise memory in .session-loop/memory/project-summary.md
+- Ask the user only at real decision gates (secrets, paid APIs, large downloads, destructive ops)
+
+Create a Codex reviewer heartbeat that runs every 5 minutes in this project/task:
+- On each wake, fresh-read .session-loop/STATE.json from disk
+- If next_actor is NOT "codex", do nothing and exit quietly
+- If next_actor IS "codex", review the latest Claude report, inspect changed files, write
+  a review, decide the next step (continue/done/blocked/needs_user_decision), and update
+  STATE.json
+- Do not check custom context usage or enforce a 60% compact gate
+
+My research goal is: [describe the goal here — paper reproduction, experiment, analysis, etc.]
+```
+
+If the loop is already installed (`.session-loop/STATE.json` exists), skip the install steps and start from "Then act as the controller/planner/reviewer."
+
+When the user says "set up the loop and create a reviewer heartbeat," you should:
+1. Install if needed.
+2. Create the heartbeat/scheduled task in Codex App for this project.
+3. Write the first bounded Claude task.
+4. Set `next_actor = "claude"` so the Claude executor loop picks it up.
+
+### 2. Developing the Loop Itself (project-internal)
+
+You are working inside the `persistent-agent-session-loop` source repository, building the loop tooling.
+
 ## Copy-Paste Prompt for a New Codex Task
 
 ```text

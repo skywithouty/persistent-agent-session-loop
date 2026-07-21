@@ -61,11 +61,9 @@ The `.session-loop/` directory is the shared state surface.
 
 It is intentionally plain text and JSON so both humans and agents can inspect it.
 
-### Context Monitor
+### Context Monitor (deprecated)
 
-Claude Code statusline records context usage into `.session-loop/context/claude-status.json`.
-
-When context usage reaches the configured target, initially 60%, the loop should compact before starting another substantial execution round.
+**Deprecated (round 16–17):** The custom context monitoring infrastructure is deprecated. The project relies exclusively on Claude Code's default auto-compact behavior. The statusline script (`claude-statusline.ps1`) and compact gate checker (`check-compact-gate.ps1`) remain as legacy files but are not required by the active loop, not installed into new projects by the Phase 5 installer, and not validated by doctor. The loop does not observe context usage, does not block on `context_at_threshold`, and does not require manual `/compact`.
 
 ### Optional Bridge
 
@@ -81,7 +79,7 @@ Its purpose is not to replace Claude Code. Its purpose is to:
 
 The bridge should be added only after the `/loop`-based MVP works.
 
-**Phase 4 clarification (from PHASE4_COMPACT_BRIDGE_DESIGN.md):** Status observation (reading `claude-status.json`) and command injection (running `/compact`) are separate concerns. The MVP design uses a **Post-Task Compact Gate**: compaction is checked only after a task completes, never mid-task. The `/loop` blocks before the next substantial task when: (a) live context reaches threshold, (b) status is mock-derived, (c) status is stale (timestamp > ~10 min old), or (d) status file is missing. In all four cases, `next_actor` is set to `"user"` with the appropriate `stop_reason`. Mock/stale/missing status is treated as **unknown** and blocks further substantial work — it must not be treated as safe-low or used to suppress compaction.
+**Phase 4 clarification (historical, from PHASE4_COMPACT_BRIDGE_DESIGN.md):** The Post-Task Compact Gate was implemented and live-validated in Phase 4a (round 12), then deprecated by user decision (round 16–17). All custom compact infrastructure — including `check-compact-gate.ps1`, the 60% threshold, and `context_at_threshold` blocking — is no longer active. The project relies exclusively on Claude Code's default auto-compact. See PHASE4_COMPACT_BRIDGE_DESIGN.md for the full historical design record.
 
 ## Data Flow
 
@@ -96,7 +94,11 @@ The bridge should be added only after the `/loop`-based MVP works.
 8. Codex writes the next task, marks done, or asks the user
 ```
 
-## Context Compaction Flow
+## Context Compaction (deprecated custom flow)
+
+The custom context compaction flow described below is deprecated (round 16–17). The project relies on Claude Code's default auto-compact behavior. The loop does not observe context usage, does not enforce a 60% threshold, and does not require manual `/compact`. Users may run `/compact` manually if they wish.
+
+The original (deprecated) flow was:
 
 ```text
 1. Claude statusline receives session metadata from Claude Code.
@@ -105,8 +107,6 @@ The bridge should be added only after the `/loop`-based MVP works.
 4. If used_percentage >= 60, compact before the next substantial task.
 5. The compaction summary preserves goal, completed work, decisions, files, verification, blockers, and next step.
 ```
-
-The first implementation can use a manual compact instruction. Full automatic `/compact` is a later bridge feature.
 
 ## Safety Model
 
@@ -126,11 +126,11 @@ Claude should stop and report blocked for risky actions rather than escalating s
 
 This design depends on current Claude Code behavior:
 
-- `/loop` can rerun prompts on a schedule inside a Claude Code session.
-- statusline can expose context window usage data.
-- `/compact` can reduce conversation history while preserving important context.
+- `/loop` can rerun prompts on a schedule inside a Claude Code session (verified).
+- `/compact` can reduce conversation history while preserving important context (verified).
+- ~~statusline can expose context window usage data~~ — no longer required. The project relies on Claude Code default auto-compact.
 
-These assumptions should be verified during Phase 1 before building the bridge.
+These assumptions were verified during Phase 1. The statusline assumption is crossed out because custom context monitoring is deprecated (round 16–17).
 
 ## Sources to Re-Check
 

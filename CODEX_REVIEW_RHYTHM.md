@@ -8,6 +8,24 @@ This document keeps the Codex controller consistent across rounds. It defines wh
 
 Phase 2 success means Codex follows these checklists every round without drift.
 
+## Codex Reviewer Heartbeat
+
+When running as a scheduled reviewer (heartbeat) in a cross-project research setup:
+
+1. **Fresh disk read first.** Every wake starts with reading `.session-loop/STATE.json` from disk. Never decide `next_actor` from conversation memory.
+2. **Exit quietly if not your turn.** If `next_actor` is NOT `"codex"`, do nothing and exit. Do not read reports, write reviews, or modify files.
+3. **Full review if it is your turn.** If `next_actor` IS `"codex"`, follow the full Claude Report Review Checklist below.
+4. **Do not check custom context gates.** The project relies on Claude Code default auto-compact. Do not read `claude-status.json`, do not run `check-compact-gate.ps1`, and do not block on `context_at_threshold`.
+
+**Interval guidance:**
+
+| Interval | When to use |
+|---|---|
+| 5 minutes | Active interactive research — fast handoff between Claude and Codex |
+| 30 minutes | Slower background monitoring — overnight runs, long experiments |
+
+The heartbeat is a Codex App scheduled task/project mechanism, not a script. The user creates it once in Codex App by asking: "create a reviewer heartbeat every 5 minutes for this project." Codex then sets up the recurring check within its own scheduling system.
+
 ## Round Lifecycle
 
 Each round follows one path:
